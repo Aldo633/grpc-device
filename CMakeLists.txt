@@ -29,6 +29,7 @@ if(CMAKE_CROSSCOMPILING)
     set(_REFLECTION grpc++_reflection)
     set(_GRPC_GRPCPP grpc++)
     set(_PROTOBUF_LIBPROTOBUF libprotobuf)
+    add_subdirectory(third_party/grpc-sideband ${CMAKE_CURRENT_BINARY_DIR}/grpc-sideband)
   endif()
 
 else()
@@ -38,6 +39,7 @@ else()
   set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc_cpp_plugin>)
   set(_GRPC_GRPCPP grpc++)
   set(_PROTOBUF_LIBPROTOBUF libprotobuf)
+  add_subdirectory(third_party/grpc-sideband ${CMAKE_CURRENT_BINARY_DIR}/grpc-sideband)
 endif()
 
 #----------------------------------------------------------------------
@@ -79,9 +81,23 @@ include_directories(
   "./generated"
   "./imports/include"
   "./source"
+  "./third_party/grpc-sideband/src"
 )
+
+#----------------------------------------------------------------------
+# Define libraries to link
+#----------------------------------------------------------------------
 if(WIN32)
   link_directories("./imports/lib/win64")
+else()
+  # Add grpc-sideband deps here
+  link_directories("./imports/lib/linux")
+endif()
+
+if(NOT MSVC)
+  set(RDMA_LIB "libnirdma.so")
+else()
+  set(RDMA_LIB "rdma.lib")
 endif()
 
 #----------------------------------------------------------------------
@@ -91,7 +107,7 @@ set(metadata_dir ${CMAKE_SOURCE_DIR}/source/codegen/metadata)
 set(service_output_dir ${CMAKE_SOURCE_DIR}/generated)
 set(codegen_dir ${CMAKE_SOURCE_DIR}/source/codegen)
 set(custom_dir ${CMAKE_SOURCE_DIR}/source/custom)
-set(nidrivers "nidaqmx" "nidcpower" "nidigitalpattern" "nidmm" "nifake" "nifake_extension" "nifake_non_ivi" "nifgen" "nimxlcterminaladaptor_restricted" "nirfmxbluetooth" "nirfmxcdma2k" "nirfmxgsm" "nirfmxinstr" "nirfmxinstr_restricted" "nirfmxlte" "nirfmxnr" "nirfmxspecan" "nirfmxspecan_restricted" "nirfmxtdscdma" "nirfmxwcdma" "nirfmxdemod" "nirfmxwlan" "nirfmxwlan_restricted" "nirfsa" "nirfsg" "niscope" "niscope_restricted" "niswitch" "nisync" "nitclk" "nixnet" "nixnetsocket" "visa")
+set(nidrivers "nidaqmx" "nidcpower" "nidigitalpattern" "nidmm" "nifake" "nifake_extension" "nifake_non_ivi" "nifgen" "nifpga" "nimxlcterminaladaptor_restricted" "nirfmxbluetooth" "nirfmxcdma2k" "nirfmxgsm" "nirfmxinstr" "nirfmxinstr_restricted" "nirfmxlte" "nirfmxnr" "nirfmxspecan" "nirfmxspecan_restricted" "nirfmxtdscdma" "nirfmxwcdma" "nirfmxdemod" "nirfmxwlan" "nirfmxwlan_restricted" "nirfsa" "nirfsg" "niscope" "niscope_restricted" "niswitch" "nisync" "nitclk" "nixnet" "nixnetsocket" "visa")
 
 #----------------------------------------------------------------------
 # Create NI Driver APIs proto and server files
@@ -225,6 +241,7 @@ set(nidriver_service_srcs
 get_filename_component(session_proto "imports/protobuf/session.proto" ABSOLUTE)
 get_filename_component(session_utilities_proto "source/protobuf/session_utilities.proto" ABSOLUTE)
 get_filename_component(nidevice_proto "imports/protobuf/nidevice.proto" ABSOLUTE)
+get_filename_component(data_moniker_proto "source/protobuf/data_moniker.proto" ABSOLUTE)
 get_filename_component(deviceid_restricted_proto "source/protobuf_restricted/deviceid_restricted.proto" ABSOLUTE)
 get_filename_component(debugsessionproperties_restricted_proto "source/protobuf_restricted/debugsessionproperties_restricted.proto" ABSOLUTE)
 get_filename_component(calibrationoperations_restricted_proto "source/protobuf_restricted/calibrationoperations_restricted.proto" ABSOLUTE)
@@ -267,6 +284,10 @@ set(session_utilities_grpc_srcs "${proto_srcs_dir}/session_utilities.grpc.pb.cc"
 set(session_utilities_grpc_hdrs "${proto_srcs_dir}/session_utilities.grpc.pb.h")
 set(nidevice_proto_srcs "${proto_srcs_dir}/nidevice.pb.cc")
 set(nidevice_proto_hdrs "${proto_srcs_dir}/nidevice.pb.h")
+set(data_moniker_proto_srcs "${proto_srcs_dir}/data_moniker.pb.cc")
+set(data_moniker_proto_hdrs "${proto_srcs_dir}/data_moniker.pb.h")
+set(data_moniker_grpc_srcs "${proto_srcs_dir}/data_moniker.grpc.pb.cc")
+set(data_moniker_grpc_hdrs "${proto_srcs_dir}/data_moniker.grpc.pb.h")
 set(deviceid_restricted_proto_srcs "${proto_srcs_dir}/deviceid_restricted.pb.cc")
 set(deviceid_restricted_proto_hdrs "${proto_srcs_dir}/deviceid_restricted.pb.h")
 set(deviceid_restricted_grpc_srcs "${proto_srcs_dir}/deviceid_restricted.grpc.pb.cc")
@@ -338,6 +359,16 @@ GenerateGrpcSources(
     "${calibrationoperations_restricted_grpc_hdrs}"
 )
 
+GenerateGrpcSources(
+  PROTO
+    ${data_moniker_proto}
+  OUTPUT
+    "${data_moniker_proto_srcs}"
+    "${data_moniker_proto_hdrs}"
+    "${data_moniker_grpc_srcs}"
+    "${data_moniker_grpc_hdrs}"
+)
+
 set(nidriver_service_library_hdrs
   ${nidriver_service_library_hdrs}
   "${session_proto_hdrs}"
@@ -397,6 +428,9 @@ add_executable(ni_grpc_device_server
    "source/server/syscfg_library.cpp"
    "source/server/syscfg_resource_accessor.cpp"
    "source/server/syscfg_session_handler.cpp"
+   "source/server/data_moniker_service.cpp"
+   ${data_moniker_proto_srcs}
+   ${data_moniker_grpc_srcs}
    ${nidevice_proto_srcs}
    ${session_proto_srcs}
    ${session_grpc_srcs}
@@ -481,6 +515,11 @@ target_link_libraries(ni_grpc_device_server
    utf8cpp
    )
 
+  target_link_libraries(ni_grpc_device_server
+  ni_grpc_sideband
+  ${RDMA_LIB}
+)
+
 set_target_properties(ni_grpc_device_server PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
 
 #----------------------------------------------------------------------
@@ -539,6 +578,7 @@ add_executable(IntegrationTestsRunner
     "source/server/syscfg_library.cpp"
     "source/server/syscfg_resource_accessor.cpp"
     "source/server/syscfg_session_handler.cpp"
+    ${data_moniker_proto_srcs}
     ${nidevice_proto_srcs}
     ${session_proto_srcs}
     ${session_grpc_srcs}
@@ -622,6 +662,7 @@ add_executable(UnitTestsRunner
     "source/server/syscfg_library.cpp"
     "source/server/syscfg_resource_accessor.cpp"
     "source/server/syscfg_session_handler.cpp"
+    ${data_moniker_proto_srcs}
     ${nidevice_proto_srcs}
     ${session_proto_srcs}
     ${session_grpc_srcs}
@@ -659,6 +700,9 @@ add_executable(UnitTestsRunner
 # in an obj file defined by PE-COFF. This line disables the limit.
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING")
+  else()
+  # On Linux, nirdma has weak symbol linkage to lvrt. So ignore errors related to undefined symbols from shared libs.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--allow-shlib-undefined")
 endif(MSVC)
 
 # Ignore the use of deprecated functions in test code
@@ -744,6 +788,7 @@ set(system_test_runner_sources
   "source/server/feature_toggles.cpp"
   "source/server/semaphore.cpp"
   "source/server/session_repository.cpp"
+  "source/server/semaphore.cpp"
   "source/server/session_utilities_service.cpp"
   "source/server/session_utilities_service_registrar.cpp"
   "source/server/shared_library.cpp"
@@ -751,6 +796,8 @@ set(system_test_runner_sources
   "source/server/syscfg_library.cpp"
   "source/server/syscfg_resource_accessor.cpp"
   "source/server/syscfg_session_handler.cpp"
+  ${data_moniker_proto_srcs}
+  ${data_moniker_grpc_srcs}
   ${nidevice_proto_srcs}
   ${session_proto_srcs}
   ${session_grpc_srcs}
@@ -801,12 +848,14 @@ endif()
 add_executable(SystemTestsRunner ${system_test_runner_sources})
 
 target_link_libraries(SystemTestsRunner
+    ni_grpc_sideband
+    ${RDMA_LIB}
     gtest
     gmock
     ${_GRPC_GRPCPP}
     ${CMAKE_DL_LIBS}
     nlohmann_json::nlohmann_json
-)
+    )
 
 # Ignore the use of deprecated functions in test code
 target_compile_definitions(SystemTestsRunner
