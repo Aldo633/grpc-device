@@ -331,6 +331,16 @@ GenerateGrpcSources(
 
 GenerateGrpcSources(
   PROTO
+    ${data_moniker_proto}
+  OUTPUT
+    "${data_moniker_proto_srcs}"
+    "${data_moniker_proto_hdrs}"
+    "${data_moniker_grpc_srcs}"
+    "${data_moniker_grpc_hdrs}"
+)
+
+GenerateGrpcSources(
+  PROTO
     ${deviceid_restricted_proto}
   OUTPUT
     "${deviceid_restricted_proto_srcs}"
@@ -359,15 +369,7 @@ GenerateGrpcSources(
     "${calibrationoperations_restricted_grpc_hdrs}"
 )
 
-GenerateGrpcSources(
-  PROTO
-    ${data_moniker_proto}
-  OUTPUT
-    "${data_moniker_proto_srcs}"
-    "${data_moniker_proto_hdrs}"
-    "${data_moniker_grpc_srcs}"
-    "${data_moniker_grpc_hdrs}"
-)
+
 
 set(nidriver_service_library_hdrs
   ${nidriver_service_library_hdrs}
