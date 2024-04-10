@@ -242,9 +242,9 @@ get_filename_component(session_proto "source/protobuf/session.proto" ABSOLUTE)
 get_filename_component(session_utilities_proto "source/protobuf/session_utilities.proto" ABSOLUTE)
 get_filename_component(nidevice_proto "source/protobuf/nidevice.proto" ABSOLUTE)
 get_filename_component(data_moniker_proto "source/protobuf/data_moniker.proto" ABSOLUTE)
-get_filename_component(deviceid_restricted_proto "imports/protobuf_restricted/deviceid_restricted.proto" ABSOLUTE)
-get_filename_component(debugsessionproperties_restricted_proto "imports/protobuf_restricted/debugsessionproperties_restricted.proto" ABSOLUTE)
-get_filename_component(calibrationoperations_restricted_proto "imports/protobuf_restricted/calibrationoperations_restricted.proto" ABSOLUTE)
+get_filename_component(deviceid_restricted_proto "source/protobuf_restricted/deviceid_restricted.proto" ABSOLUTE)
+get_filename_component(debugsessionproperties_restricted_proto "source/protobuf_restricted/debugsessionproperties_restricted.proto" ABSOLUTE)
+get_filename_component(calibrationoperations_restricted_proto "source/protobuf_restricted/calibrationoperations_restricted.proto" ABSOLUTE)
 get_filename_component(session_proto_path "${session_proto}" PATH)
 
 #----------------------------------------------------------------------

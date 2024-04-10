@@ -1,8 +1,9 @@
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <grpcpp/grpcpp.h>
 #include <register_all_services.h>
-
+#include <sideband_data.h>
 #include <mutex>
+#include <thread>
 
 #include "feature_toggles.h"
 #include "logging.h"
@@ -12,17 +13,12 @@
 #if defined(__GNUC__)
   #include "linux/daemonize.h"
   #include "linux/syslog_logging.h"
+  #include <sys/mman.h>
 #endif
-#if defined(_WIN32)
-  #include "windows/console_ctrl_handler.h"
-#endif
-
-#include "version.h"
 
 using FeatureState = nidevice_grpc::FeatureToggles::FeatureState;
 
 struct ServerConfiguration {
-  std::string config_file_path;
   std::string server_address;
   std::string server_cert;
   std::string server_key;
@@ -38,8 +34,6 @@ static ServerConfiguration GetConfiguration(const std::string& config_file_path)
     nidevice_grpc::ServerConfigurationParser server_config_parser = config_file_path.empty()
         ? nidevice_grpc::ServerConfigurationParser()
         : nidevice_grpc::ServerConfigurationParser(config_file_path);
-
-    config.config_file_path = server_config_parser.get_config_file_path();
     config.server_address = server_config_parser.parse_address();
     config.server_cert = server_config_parser.parse_server_cert();
     config.server_key = server_config_parser.parse_server_key();
@@ -60,7 +54,7 @@ static std::mutex server_mutex;
 static std::unique_ptr<grpc::Server> server;
 static bool shutdown = false;
 
-static void StopServer()
+static void StopServer() 
 {
   std::lock_guard<std::mutex> guard(server_mutex);
   shutdown = true;
@@ -71,13 +65,6 @@ static void StopServer()
 
 static void RunServer(const ServerConfiguration& config)
 {
-  if (!config.config_file_path.empty()) {
-    nidevice_grpc::logging::log(
-      nidevice_grpc::logging::Level_Info,
-      "Using server configuration from %s",
-      config.config_file_path.c_str());
-  }
-
   grpc::EnableDefaultHealthCheckService(true);
   grpc::reflection::InitProtoReflectionServerBuilderPlugin();
 
@@ -87,10 +74,10 @@ static void RunServer(const ServerConfiguration& config)
   builder.AddListeningPort(config.server_address, server_security_config.get_credentials(), &listeningPort);
 
   auto services = nidevice_grpc::register_all_services(builder, config.feature_toggles);
-
+  
   builder.SetMaxSendMessageSize(config.max_message_size);
   builder.SetMaxReceiveMessageSize(config.max_message_size);
-
+  
   // Assemble the server.
   {
     std::lock_guard<std::mutex> guard(server_mutex);
@@ -102,6 +89,10 @@ static void RunServer(const ServerConfiguration& config)
     }
     server = builder.BuildAndStart();
   }
+
+  auto sideband_socket_thread = new std::thread(RunSidebandSocketsAccept, "localhost", 50055);
+  auto sideband_rdma_send_thread = new std::thread(AcceptSidebandRdmaSendRequests);
+  auto sideband_rdma_recv_thread = new std::thread(AcceptSidebandRdmaReceiveRequests);
 
   if (!server) {
     nidevice_grpc::logging::log(
@@ -127,13 +118,6 @@ static void RunServer(const ServerConfiguration& config)
       "Security is configured with %s%s.", security_description, tls_description);
   // This call will block until another thread shuts down the server.
   server->Wait();
-
-  // destroy services in reverse order
-  while (!services->empty()) {
-    services->pop_back();
-  }
-
-  nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, "Server stopped.");
 }
 
 struct Options {
@@ -187,17 +171,6 @@ Options parse_options(int argc, char** argv)
       nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, usage);
       exit(EXIT_SUCCESS);
     }
-    else if (strcmp("--version", argv[i]) == 0) {
-      std::string string_kNiDeviceGrpcBranchName(nidevice_grpc::kNiDeviceGrpcBranchName);
-      if (string_kNiDeviceGrpcBranchName.rfind("releases", 0) == 0) {
-        nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, nidevice_grpc::kNiDeviceGrpcFileVersion);
-      }
-      else {
-        nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, nidevice_grpc::kNiDeviceGrpcFileVersion);
-        nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, "dev");
-      }
-      exit(EXIT_SUCCESS);
-    }
     else if (i == argc - 1) {
       options.config_file_path = argv[i];
     }
@@ -221,11 +194,18 @@ Options parse_options(int argc, char** argv)
   return options;
 }
 
+static void SysFsWrite(const std::string& fileName, const std::string& value)
+{
+    std::ofstream fout;
+    fout.open(fileName);
+    fout << value;
+    fout.close();
+}
+
 int main(int argc, char** argv)
 {
   auto options = parse_options(argc, argv);
   auto config = GetConfiguration(options.config_file_path);
-  setlocale(LC_ALL, "");
 #if defined(__GNUC__)
   if (options.use_syslog) {
     nidevice_grpc::logging::setup_syslog(options.daemonize, options.identity);
@@ -236,8 +216,23 @@ int main(int argc, char** argv)
     nidevice_grpc::daemonize(&StopServer, options.identity);
   }
 #endif
-#if defined(_WIN32)
-  nidevice_grpc::set_console_ctrl_handler(&StopServer);
+
+#ifndef _WIN32
+    SysFsWrite("/dev/cgroup/cpuset/system_set/cpus", "0-5");
+    SysFsWrite("/dev/cgroup/cpuset/LabVIEW_ScanEngine_set", "0-5");
+    SysFsWrite("/dev/cgroup/cpuset/LabVIEW_tl_set/cpus", "6-8");
+    SysFsWrite("/dev/cgroup/cpuset/LabVIEW_tl_set/cpu_exclusive", "1");
+
+    sched_param schedParam;
+    schedParam.sched_priority = 95;
+    sched_setscheduler(0, SCHED_FIFO, &schedParam);
+
+    cpu_set_t cpuSet;
+    CPU_ZERO(&cpuSet);
+    CPU_SET(6, &cpuSet);
+    sched_setaffinity(0, sizeof(cpu_set_t), &cpuSet);
+
+    mlockall(MCL_CURRENT|MCL_FUTURE);
 #endif
 
   RunServer(config);
