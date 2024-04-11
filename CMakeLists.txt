@@ -268,7 +268,7 @@ function(GenerateGrpcSources)
       --cpp_out "${proto_out_path}"
       -I "${proto_path}"
       -I ${CMAKE_SOURCE_DIR}/third_party/grpc/third_party/protobuf/src/
-      -I ${CMAKE_SOURCE_DIR}/imports/protobuf
+      -I ${CMAKE_SOURCE_DIR}/source/protobuf
       --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
       "${proto_file}"
     DEPENDS "${proto_file}" "${session_proto}")
