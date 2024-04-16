@@ -477,6 +477,20 @@ def filter_proto_rpc_functions(functions):
         if function.get("codegen_method", "public") in functions_for_proto
     ]
 
+def filter_data_moniker_functions(functions):
+    """Return function metadata only for functions that use the data moniker service."""
+    return [
+        name
+        for name, function in functions.items()
+        if function.get("data_moniker_support", False)
+    ]
+
+
+def get_data_moniker_function_name(function_name, function_data):
+    """Return the corresponding moniker function name for the given C API function."""
+    if function_data.get("moniker_cname", None):
+        return function_data["moniker_cname"]
+    return function_name.replace("Begin", "Moniker")
 
 def filter_proto_rpc_functions_for_message(functions):
     """Return function metadata only for functions to include for generating proto rpc messages."""
