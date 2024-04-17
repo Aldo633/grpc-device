@@ -239,7 +239,7 @@ set(nidriver_service_srcs
 # Proto file
 #----------------------------------------------------------------------
 get_filename_component(session_proto "imports/protobuf/session.proto" ABSOLUTE)
-get_filename_component(session_utilities_proto "imports/protobuf/session_utilities.proto" ABSOLUTE)
+get_filename_component(session_utilities_proto "source/protobuf/session_utilities.proto" ABSOLUTE)
 get_filename_component(nidevice_proto "imports/protobuf/nidevice.proto" ABSOLUTE)
 get_filename_component(data_moniker_proto "imports/protobuf/data_moniker.proto" ABSOLUTE)
 get_filename_component(deviceid_restricted_proto "imports/protobuf_restricted/deviceid_restricted.proto" ABSOLUTE)
