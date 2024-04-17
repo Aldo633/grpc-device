@@ -35,9 +35,6 @@ package ${config["namespace_component"]}_grpc;
 import "nidevice.proto";
 % endif
 import "session.proto";
-% for proto in external_proto_deps:
-import "${proto}";
-% endfor
 % for proto in additional_protos:
 import "${proto}";
 % endfor
