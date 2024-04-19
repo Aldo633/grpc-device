@@ -7,6 +7,7 @@ config = {
     'java_package': 'com.ni.grpc.nidaqmx',
     'csharp_namespace': 'NationalInstruments.Grpc.NiDAQmx',
     'namespace_component': 'nidaqmx',
+    'additional_protos': ['data_moniker.proto'],
     'close_function': 'ClearTask',
     'custom_types': [
         {
