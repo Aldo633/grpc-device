@@ -573,7 +573,7 @@ ${initialize_standard_input_param(function_name, parameter)}
   c_type_underlying_type = common_helpers.get_underlying_type_name(c_type)
   c_element_type_that_needs_coercion = service_helpers.get_c_element_type_for_array_that_needs_coercion(parameter)
 %>\
-% if c_type in ['ViConstString', 'const char[]']:
+% if c_type in ['ViConstString', 'const char[]', 'const char*']:
       auto ${parameter_name}_mbcs = convert_from_grpc<std::string>(${request_snippet});
       auto ${parameter_name} = ${parameter_name}_mbcs.c_str();\
 % elif grpc_type == 'string':
