@@ -31,6 +31,10 @@ struct NiDAQmxFeatureToggles
   bool is_enabled;
   bool is_allow_undefined_attributes_enabled;
 };
+void RegisterMonikers();
+
+::grpc::Status MonikerWriteAnalogF64Stream(void* data, google::protobuf::Any& packedData);
+
 
 class NiDAQmxService final : public NiDAQmx::WithCallbackMethod_RegisterSignalEvent<NiDAQmx::WithCallbackMethod_RegisterEveryNSamplesEvent<NiDAQmx::WithCallbackMethod_RegisterDoneEvent<NiDAQmx::Service>>> {
 public:
@@ -441,6 +445,7 @@ public:
   ::grpc::Status WriteRaw(::grpc::ServerContext* context, const WriteRawRequest* request, WriteRawResponse* response) override;
   ::grpc::Status WriteToTEDSFromArray(::grpc::ServerContext* context, const WriteToTEDSFromArrayRequest* request, WriteToTEDSFromArrayResponse* response) override;
   ::grpc::Status WriteToTEDSFromFile(::grpc::ServerContext* context, const WriteToTEDSFromFileRequest* request, WriteToTEDSFromFileResponse* response) override;
+  ::grpc::Status BeginWriteAnalogF64Stream(::grpc::ServerContext* context, const BeginWriteAnalogF64StreamRequest* request, BeginWriteAnalogF64StreamResponse* response) override;
 private:
   LibrarySharedPtr library_;
   ResourceRepositorySharedPtr session_repository_;

@@ -25449,7 +25449,7 @@ functions = {
     },
     'BeginWriteAnalogF64Stream': {
         'exclude_from_library': True,
-        'data_moniker_service': True,
+        'data_moniker_support': True,
         'python_codegen_method': 'CustomCode',
         'parameters': [
             {

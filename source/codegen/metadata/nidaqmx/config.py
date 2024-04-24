@@ -8,6 +8,7 @@ config = {
     'csharp_namespace': 'NationalInstruments.Grpc.NiDAQmx',
     'namespace_component': 'nidaqmx',
     'additional_protos': ['data_moniker.proto'],
+    'use_moniker_service': True,
     'close_function': 'ClearTask',
     'custom_types': [
         {

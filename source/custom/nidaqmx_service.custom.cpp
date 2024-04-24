@@ -21,7 +21,8 @@ struct MonikerWriteDAQmxData {
   bool auto_start;
   double timeout;
   int32 data_layout;
-  NiDAQmxLibraryInterface* library;
+  //NiDAQmxLibraryInterface* library; // Check the shared ptr definition
+  std::shared_ptr<NiDAQmxLibraryInterface> library;
 };
 
 //---------------------------------------------------------------------
@@ -81,7 +82,7 @@ grpc::Status MonikerWriteAnalogF64Stream(void* data, google::protobuf::Any& pack
 
     writeData->library = library_;
     ni::data_monikers::Moniker* writeMoniker = new ni::data_monikers::Moniker();
-    ni::MonikerServiceImpl::RegisterMonikerInstance("MonikerWriteAnalogF64Stream", writeData, *writeMoniker);
+    ni::data_monikers::DataMonikerService::RegisterMonikerInstance("MonikerWriteAnalogF64Stream", writeData, *writeMoniker);
     response->set_allocated_moniker(writeMoniker);
     return ::grpc::Status::OK;
   }
@@ -90,9 +91,10 @@ grpc::Status MonikerWriteAnalogF64Stream(void* data, google::protobuf::Any& pack
   }
 }
 
-void NiDAQmxService::initialize()
+//void NiDAQmxService::initialize()
+void RegisterMonikers()
 {
-  ni::MonikerServiceImpl::RegisterMonikerEndpoint("MonikerWriteAnalogF64Stream", MonikerWriteAnalogF64Stream);
+  ni::data_monikers::DataMonikerService::RegisterMonikerEndpoint("MonikerWriteAnalogF64Stream", MonikerWriteAnalogF64Stream);
   // ni::MonikerServiceImpl::RegisterMonikerEndpoint("MonikerReadAnalogF64Stream", MonikerReadAnalogF64Stream);
 }
 
