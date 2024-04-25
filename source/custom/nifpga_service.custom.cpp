@@ -1359,7 +1359,7 @@ struct MonikerArrayU64Data
   std::string description(nidevice_grpc::kMaxGrpcErrorDescriptionSize, '\0');
   // There is no function in FPGA C API to get error descriptions
   //library_->GetError(vi, &error_code, nidevice_grpc::kMaxGrpcErrorDescriptionSize, &description[0]);
-  description = "FPGA error Number: "+std::to_string(status)
+  description = "FPGA error Number: "+std::to_string(status);
   
   return nidevice_grpc::ApiErrorAndDescriptionToStatus(context, status, description);
 }
