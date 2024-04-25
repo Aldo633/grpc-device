@@ -581,7 +581,9 @@ add_executable(IntegrationTestsRunner
     "source/server/syscfg_library.cpp"
     "source/server/syscfg_resource_accessor.cpp"
     "source/server/syscfg_session_handler.cpp"
+	"source/server/data_moniker_service.cpp"
     ${data_moniker_proto_srcs}
+	${data_moniker_grpc_srcs}
     ${nidevice_proto_srcs}
     ${session_proto_srcs}
     ${session_grpc_srcs}
@@ -617,6 +619,12 @@ target_link_libraries(IntegrationTestsRunner
     ${CMAKE_DL_LIBS}
     Threads::Threads
     nlohmann_json::nlohmann_json)
+	
+target_link_libraries(IntegrationTestsRunner
+    ni_grpc_sideband
+    ${RDMA_LIB}
+)
+
 
 # Ignore the use of deprecated functions in test code
 target_compile_definitions(IntegrationTestsRunner
