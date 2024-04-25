@@ -231,7 +231,31 @@ def is_string_arg(parameter):
     """Whether the parameter's type is string or bytes."""
     return parameter["grpc_type"] in ["string", "bytes"]
 
+def is_fpga_string_arg(parameter):
+    """Whether the parameter's type is string or bytes."""
+    return parameter["type"] in ["const char*"]
 
+def is_void_arg(parameter):
+    """Whether the parameter's type is string or bytes."""
+    return parameter["type"] in ["void *"]
+
+def is_xnetsockaddr(parameter):
+    """Whether the parameter's type is nxaddrinfo"""
+    return parameter["type"] in ["nxaddrinfo"]
+
+def is_xnetvirtualinterface(parameter):
+    """Whether the parameter's type is nxVirtualInterface_t"""
+    return parameter["type"] in ["nxVirtualInterface_t"]
+    
+    
+def is_void_arg(parameter):
+    """Whether the parameter's type is string or bytes."""
+    return parameter["type"] in ["void *"]
+
+def is_xnetsockaddr(parameter):
+    """Whether the parameter's type is nxaddrinfo"""
+    return parameter["type"] in ["nxaddrinfo"]
+        
 def is_nidevice_enum_parameter(grpc_type):
     """Whether the grpc_type is one of the enums in nidevice_grpc."""
     return grpc_type in ["nidevice_grpc.SessionInitializationBehavior"]

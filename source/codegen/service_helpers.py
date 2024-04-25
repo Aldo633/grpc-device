@@ -267,8 +267,12 @@ def _create_param(parameter, expand_varargs=True, repeated_parameters=None):
             return f"{type[:-2]}* {name}"
         else:
             return f"{type[:-2]} {name}[{array_size}]"
-    elif common_helpers.is_pointer_parameter(parameter) and not common_helpers.is_string_arg(parameter):
+    elif common_helpers.is_pointer_parameter(parameter) and not common_helpers.is_string_arg(parameter) and not common_helpers.is_void_arg(parameter) and not common_helpers.is_xnetsockaddr(parameter) and not common_helpers.is_xnetvirtualinterface(parameter):
             return f"{type}* {name}"
+    elif common_helpers.is_fpga_string_arg(parameter):
+            return f"{type} {name}"
+    elif common_helpers.is_void_arg(parameter):
+            return f"{type} {name}"
     else:
         pointer_qualifier = "*" * common_helpers.levels_of_pointer_indirection(parameter)
         return f"{type}{pointer_qualifier} {name}"

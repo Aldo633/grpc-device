@@ -101,7 +101,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerBoolData* readData = new MonikerBoolData();
         readData->session = session;
@@ -145,7 +145,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU32Data* readData = new MonikerU32Data();
         readData->session = session;
@@ -190,7 +190,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU32Data* readData = new MonikerU32Data();
         readData->session = session;
@@ -235,7 +235,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU32Data* readData = new MonikerU32Data();
         readData->session = session;
@@ -280,7 +280,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU32Data* readData = new MonikerU32Data();
         readData->session = session;
@@ -325,7 +325,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerI32Data* readData = new MonikerI32Data();
         readData->session = session;
@@ -370,7 +370,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU32Data* readData = new MonikerU32Data();
         readData->session = session;
@@ -415,7 +415,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerI64Data* readData = new MonikerI64Data();
         readData->session = session;
@@ -460,7 +460,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU64Data* readData = new MonikerU64Data();
         readData->session = session;
@@ -517,7 +517,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerI32Data* writeData = new MonikerI32Data();
         writeData->session = session;
@@ -565,7 +565,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU32Data* writeData = new MonikerU32Data();
         writeData->session = session;
@@ -613,7 +613,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerI32Data* writeData = new MonikerI32Data();
         writeData->session = session;
@@ -661,7 +661,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU32Data* writeData = new MonikerU32Data();
         writeData->session = session;
@@ -709,7 +709,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerI32Data* writeData = new MonikerI32Data();
         writeData->session = session;
@@ -753,7 +753,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU32Data* writeData = new MonikerU32Data();
         writeData->session = session;
@@ -797,7 +797,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerI64Data* writeData = new MonikerI64Data();
         writeData->session = session;
@@ -841,7 +841,7 @@ struct MonikerBoolData
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerU64Data* writeData = new MonikerU64Data();
         writeData->session = session;
@@ -926,7 +926,7 @@ struct MonikerArrayU64Data
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerArrayI32Data* readData = new MonikerArrayI32Data();
         readData->session = session;
@@ -981,7 +981,7 @@ struct MonikerArrayU64Data
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerArrayU32Data* readData = new MonikerArrayU32Data();
         readData->session = session;
@@ -1036,7 +1036,7 @@ struct MonikerArrayU64Data
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerArrayI64Data* readData = new MonikerArrayI64Data();
         readData->session = session;
@@ -1091,7 +1091,7 @@ struct MonikerArrayU64Data
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerArrayU64Data* readData = new MonikerArrayU64Data();
         readData->session = session;
@@ -1149,7 +1149,7 @@ struct MonikerArrayU64Data
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerArrayI32Data* writeData = new MonikerArrayI32Data();
         writeData->session = session;
@@ -1207,7 +1207,7 @@ struct MonikerArrayU64Data
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerArrayU32Data* writeData = new MonikerArrayU32Data();
         writeData->session = session;
@@ -1265,7 +1265,7 @@ struct MonikerArrayU64Data
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerArrayI64Data* writeData = new MonikerArrayI64Data();
         writeData->session = session;
@@ -1310,7 +1310,7 @@ struct MonikerArrayU64Data
     }
     try {
         auto session_grpc_session = request->session();
-        NiFpga_Session session = session_repository_->access_session(session_grpc_session.id(), session_grpc_session.name());
+        NiFpga_Session session = session_repository_->access_session(session_grpc_session.name());
 
         MonikerArrayU64Data* writeData = new MonikerArrayU64Data();
         writeData->session = session;
@@ -1348,4 +1348,19 @@ struct MonikerArrayU64Data
     return ::grpc::Status::OK;
 }
 
+
+//::grpc::Status NiDAQmxService::ConvertApiErrorStatusForTaskHandle(::grpc::ServerContextBase* context, int32_t status, TaskHandle task)
+// undefined reference to `nifpga_grpc::NiFpgaService::ConvertApiErrorStatusForNiFpga_Session(grpc::ServerContextBase*, int, unsigned int)'
+
+::grpc::Status NiFpgaService::ConvertApiErrorStatusForNiFpga_Session(::grpc::ServerContextBase* context, int32_t status, NiFpga_Session session)
+{
+  // This implementation assumes this method is always called on the same thread where the error occurred.
+  
+  std::string description(nidevice_grpc::kMaxGrpcErrorDescriptionSize, '\0');
+  // There is no function in FPGA C API to get error descriptions
+  //library_->GetError(vi, &error_code, nidevice_grpc::kMaxGrpcErrorDescriptionSize, &description[0]);
+  description = "FPGA error Number: "+std::to_string(status)
+  
+  return nidevice_grpc::ApiErrorAndDescriptionToStatus(context, status, description);
+}
 }  // namespace nifpga_grpc

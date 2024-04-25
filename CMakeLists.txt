@@ -24,6 +24,7 @@ if(CMAKE_CROSSCOMPILING)
     find_library(_REFLECTION grpc++_reflection)
     find_library(_GRPC_GRPCPP grpc++)
     find_library(_PROTOBUF_LIBPROTOBUF protobuf)
+    # find_package(ni-grpc-sideband REQUIRED)
   else()
     add_subdirectory(third_party/grpc ${CMAKE_CURRENT_BINARY_DIR}/grpc EXCLUDE_FROM_ALL)
     set(_REFLECTION grpc++_reflection)
@@ -796,6 +797,7 @@ set(system_test_runner_sources
   "source/server/shared_library.cpp"
   "source/server/software_enumerator.cpp"
   "source/server/syscfg_library.cpp"
+  "source/server/data_moniker_service.cpp"
   "source/server/syscfg_resource_accessor.cpp"
   "source/server/syscfg_session_handler.cpp"
   ${data_moniker_proto_srcs}
@@ -850,14 +852,17 @@ endif()
 add_executable(SystemTestsRunner ${system_test_runner_sources})
 
 target_link_libraries(SystemTestsRunner
-    ni_grpc_sideband
-    ${RDMA_LIB}
     gtest
     gmock
     ${_GRPC_GRPCPP}
     ${CMAKE_DL_LIBS}
     nlohmann_json::nlohmann_json
     )
+
+target_link_libraries(SystemTestsRunner
+    ni_grpc_sideband
+    ${RDMA_LIB}
+)
 
 # Ignore the use of deprecated functions in test code
 target_compile_definitions(SystemTestsRunner
