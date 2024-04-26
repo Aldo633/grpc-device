@@ -269,7 +269,10 @@ int main(int argc, char** argv)
     sched_setaffinity(0, sizeof(cpu_set_t), &cpuSet);
 
     mlockall(MCL_CURRENT|MCL_FUTURE);
-      nidevice_grpc::set_console_ctrl_handler(&StopServer);
+#endif
+
+#if defined(_WIN32)
+  nidevice_grpc::set_console_ctrl_handler(&StopServer);
 #endif
 
   RunServer(config);
