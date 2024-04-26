@@ -16,7 +16,7 @@
   #include "linux/syslog_logging.h"
   #include <sys/mman.h>
 #endif
-#endif
+
 #if defined(_WIN32)
   #include "windows/console_ctrl_handler.h"
 #endif
