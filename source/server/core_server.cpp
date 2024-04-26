@@ -1,6 +1,7 @@
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <grpcpp/grpcpp.h>
 #include <register_all_services.h>
+
 #include <sideband_data.h>
 #include <mutex>
 #include <thread>
@@ -15,10 +16,17 @@
   #include "linux/syslog_logging.h"
   #include <sys/mman.h>
 #endif
+#endif
+#if defined(_WIN32)
+  #include "windows/console_ctrl_handler.h"
+#endif
+
+#include "version.h"
 
 using FeatureState = nidevice_grpc::FeatureToggles::FeatureState;
 
 struct ServerConfiguration {
+  std::string config_file_path;
   std::string server_address;
   std::string server_cert;
   std::string server_key;
@@ -34,6 +42,8 @@ static ServerConfiguration GetConfiguration(const std::string& config_file_path)
     nidevice_grpc::ServerConfigurationParser server_config_parser = config_file_path.empty()
         ? nidevice_grpc::ServerConfigurationParser()
         : nidevice_grpc::ServerConfigurationParser(config_file_path);
+
+    config.config_file_path = server_config_parser.get_config_file_path();
     config.server_address = server_config_parser.parse_address();
     config.server_cert = server_config_parser.parse_server_cert();
     config.server_key = server_config_parser.parse_server_key();
@@ -65,6 +75,13 @@ static void StopServer()
 
 static void RunServer(const ServerConfiguration& config)
 {
+    if (!config.config_file_path.empty()) {
+    nidevice_grpc::logging::log(
+      nidevice_grpc::logging::Level_Info,
+      "Using server configuration from %s",
+      config.config_file_path.c_str());
+  }
+
   grpc::EnableDefaultHealthCheckService(true);
   grpc::reflection::InitProtoReflectionServerBuilderPlugin();
 
@@ -118,6 +135,13 @@ static void RunServer(const ServerConfiguration& config)
       "Security is configured with %s%s.", security_description, tls_description);
   // This call will block until another thread shuts down the server.
   server->Wait();
+  
+  // destroy services in reverse order
+  while (!services->empty()) {
+    services->pop_back();
+  }
+
+  nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, "Server stopped.");
 }
 
 struct Options {
@@ -171,6 +195,17 @@ Options parse_options(int argc, char** argv)
       nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, usage);
       exit(EXIT_SUCCESS);
     }
+       else if (strcmp("--version", argv[i]) == 0) {
+      std::string string_kNiDeviceGrpcBranchName(nidevice_grpc::kNiDeviceGrpcBranchName);
+      if (string_kNiDeviceGrpcBranchName.rfind("releases", 0) == 0) {
+        nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, nidevice_grpc::kNiDeviceGrpcFileVersion);
+      }
+      else {
+        nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, nidevice_grpc::kNiDeviceGrpcFileVersion);
+        nidevice_grpc::logging::log(nidevice_grpc::logging::Level_Info, "dev");
+      }
+      exit(EXIT_SUCCESS);
+    }
     else if (i == argc - 1) {
       options.config_file_path = argv[i];
     }
@@ -206,6 +241,7 @@ int main(int argc, char** argv)
 {
   auto options = parse_options(argc, argv);
   auto config = GetConfiguration(options.config_file_path);
+  setlocale(LC_ALL, "");
 #if defined(__GNUC__)
   if (options.use_syslog) {
     nidevice_grpc::logging::setup_syslog(options.daemonize, options.identity);
@@ -233,6 +269,7 @@ int main(int argc, char** argv)
     sched_setaffinity(0, sizeof(cpu_set_t), &cpuSet);
 
     mlockall(MCL_CURRENT|MCL_FUTURE);
+      nidevice_grpc::set_console_ctrl_handler(&StopServer);
 #endif
 
   RunServer(config);
