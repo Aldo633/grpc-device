@@ -53,6 +53,7 @@ config = {
             }
         }
     },
+    'linux_rt_support': True,
     'metadata_version': '0.1',
     'module_name': 'nifpga',
     'session_class_description': 'An NI-FPGA session',
