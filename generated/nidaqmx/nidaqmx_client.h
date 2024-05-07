@@ -420,6 +420,7 @@ WriteDigitalU8Response write_digital_u8(const StubPtr& stub, const nidevice_grpc
 WriteRawResponse write_raw(const StubPtr& stub, const nidevice_grpc::Session& task, const pb::int32& num_samps, const bool& auto_start, const double& timeout, const std::string& write_array);
 WriteToTEDSFromArrayResponse write_to_teds_from_array(const StubPtr& stub, const std::string& physical_channel, const std::string& bit_stream, const simple_variant<WriteBasicTEDSOptions, pb::int32>& basic_teds_options);
 WriteToTEDSFromFileResponse write_to_teds_from_file(const StubPtr& stub, const std::string& physical_channel, const std::string& file_path, const simple_variant<WriteBasicTEDSOptions, pb::int32>& basic_teds_options);
+BeginWriteAnalogF64StreamResponse begin_write_analog_f64_stream(const StubPtr& stub, const nidevice_grpc::Session& task, const pb::int32& num_samps_per_chan, const bool& auto_start, const double& timeout, const simple_variant<GroupBy, pb::int32>& data_layout, const std::vector<double>& write_array);
 
 } // namespace nidaqmx_grpc::experimental::client
 

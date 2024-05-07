@@ -19445,6 +19445,50 @@ namespace nidaqmx_grpc {
     }
   }
 
+  //---------------------------------------------------------------------
+  //---------------------------------------------------------------------
+  ::grpc::Status NiDAQmxService::BeginWriteAnalogF64Stream(::grpc::ServerContext* context, const BeginWriteAnalogF64StreamRequest* request, BeginWriteAnalogF64StreamResponse* response)
+  {
+    if (context->IsCancelled()) {
+      return ::grpc::Status::CANCELLED;
+    }
+    try {
+      auto task_grpc_session = request->task();
+      TaskHandle task = session_repository_->access_session(task_grpc_session.name());
+      int32 num_samps_per_chan = request->num_samps_per_chan();
+      bool32 auto_start = request->auto_start();
+      float64 timeout = request->timeout();
+      int32 data_layout;
+      switch (request->data_layout_enum_case()) {
+        case nidaqmx_grpc::BeginWriteAnalogF64StreamRequest::DataLayoutEnumCase::kDataLayout: {
+          data_layout = static_cast<int32>(request->data_layout());
+          break;
+        }
+        case nidaqmx_grpc::BeginWriteAnalogF64StreamRequest::DataLayoutEnumCase::kDataLayoutRaw: {
+          data_layout = static_cast<int32>(request->data_layout_raw());
+          break;
+        }
+        case nidaqmx_grpc::BeginWriteAnalogF64StreamRequest::DataLayoutEnumCase::DATA_LAYOUT_ENUM_NOT_SET: {
+          return ::grpc::Status(::grpc::INVALID_ARGUMENT, "The value for data_layout was not specified or out of range");
+          break;
+        }
+      }
+
+      auto write_array = const_cast<const float64*>(request->write_array().data());
+      ni::data_monikers::Moniker moniker {};
+      auto status = library_->BeginWriteAnalogF64Stream(task, num_samps_per_chan, auto_start, timeout, data_layout, write_array, &moniker);
+      if (!status_ok(status)) {
+        return ConvertApiErrorStatusForTaskHandle(context, status, task);
+      }
+      response->set_status(status);
+      response->set_moniker(moniker);
+      return ::grpc::Status::OK;
+    }
+    catch (nidevice_grpc::NonDriverException& ex) {
+      return ex.GetStatus();
+    }
+  }
+
 
   NiDAQmxFeatureToggles::NiDAQmxFeatureToggles(
     const nidevice_grpc::FeatureToggles& feature_toggles)

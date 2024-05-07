@@ -25446,5 +25446,51 @@ functions = {
         'python_class_name': 'PhysicalChannel',
         'python_description': 'Writes data from a virtual TEDS file to the TEDS sensor.',
         'returns': 'int32'
+    },
+    'BeginWriteAnalogF64Stream': {
+        'exclude_from_library': True,
+        'data_moniker_support': True,
+        'python_codegen_method': 'CustomCode',
+        'parameters': [
+            {
+                'direction': 'in',
+                'name': 'task',
+                'type': 'TaskHandle'
+            },
+            {
+                'direction': 'in',
+                'name': 'numSampsPerChan',
+                'type': 'int32'
+            },
+            {
+                'direction': 'in',
+                'name': 'autoStart',
+                'type': 'bool32'
+            },
+            {
+                'direction': 'in',
+                'name': 'timeout',
+                'type': 'float64'
+            },
+            {
+                'direction': 'in',
+                'enum': 'GroupBy',
+                'name': 'dataLayout',
+                'type': 'int32'
+            },
+            {
+                'direction': 'in',
+                'name': 'writeArray',
+                'type': 'const float64[]'
+            },
+            {
+                'direction': 'out',
+                'grpc_type': 'ni.data_monikers.Moniker',
+                'name': 'moniker',
+                #'type': 'DO_NOT_USE'
+                'type': 'ni::data_monikers::Moniker'
+            },
+        ],
+        'returns': 'int32'
     }
 }
